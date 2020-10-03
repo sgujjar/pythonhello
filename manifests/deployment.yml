@@ -1,0 +1,19 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: "boldchickenaks-ba2e"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: "boldchickenaks-ba2e"
+  template:
+    metadata:
+      labels:
+        app: "boldchickenaks-ba2e"
+    spec:
+      containers:
+        - name: "boldchickenaks-ba2e"
+          image: "sgujjaracrreg.azurecr.io/boldchickenaks"
+          ports:
+          - containerPort: 80
