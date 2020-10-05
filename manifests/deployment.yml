@@ -16,4 +16,4 @@ spec:
         - name: "boldchickenaks-ba2e"
           image: "sgujjaracrreg.azurecr.io/boldchickenaks"
           ports:
-          - containerPort: 80
+          - containerPort: 5000
