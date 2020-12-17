@@ -1,0 +1,50 @@
+on: [push]
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    
+    - uses: azure/docker-login@v1
+      with:
+        login-server: cidemoacr.azurecr.io
+        username: ${{ secrets.acr_cidemoacr_username }}
+        password: ${{ secrets.acr_cidemoacr_password }}
+    
+    - name: Build and push image to ACR
+      id: build-image
+      run: |
+        docker build "$GITHUB_WORKSPACE/" -f  "Dockerfile" -t cidemoacr.azurecr.io/boldchickenaks:${{ github.sha }}
+        docker push cidemoacr.azurecr.io/boldchickenaks:${{ github.sha }}
+    
+    - uses: azure/k8s-set-context@v1
+      with:
+         kubeconfig: ${{ secrets.aks_boldchickenaks_kubeConfig }}
+      id: login
+    
+    - name: Create namespace
+      run: |
+        namespacePresent=`kubectl get namespace | grep bold-chicken-aksacc9 | wc -l`
+        if [ $namespacePresent -eq 0 ]
+        then
+            echo `kubectl create namespace bold-chicken-aksacc9`
+        fi
+
+    - uses: azure/k8s-create-secret@v1
+      with:
+        namespace: bold-chicken-aksacc9
+        container-registry-url: cidemoacr.azurecr.io
+        container-registry-username: ${{ secrets.acr_cidemoacr_username }}
+        container-registry-password: ${{ secrets.acr_cidemoacr_password }}
+        secret-name: boldchickenadockerauth
+       
+    - uses: azure/k8s-deploy@v1.2
+      with:
+        namespace: bold-chicken-aksacc9
+        manifests: |
+          manifests/deployment-1.yml
+          manifests/service-1.yml
+        images: |
+          cidemoacr.azurecr.io/boldchickenaks:${{ github.sha }}
+        imagepullsecrets: |
+          boldchickenadockerauth
