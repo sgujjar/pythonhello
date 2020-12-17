@@ -1,0 +1,19 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: "boldchickenaks-0404"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: "boldchickenaks-0404"
+  template:
+    metadata:
+      labels:
+        app: "boldchickenaks-0404"
+    spec:
+      containers:
+        - name: "boldchickenaks-0404"
+          image: "cidemoacr.azurecr.io/boldchickenaks"
+          ports:
+          - containerPort: 80
