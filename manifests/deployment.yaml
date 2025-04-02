@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myakscluster-app
+  labels:
+    app: myakscluster-app
+  namespace: namespace-workflow-1706750885628
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myakscluster-app
+  template:
+    metadata:
+      labels:
+        app: myakscluster-app
+    spec:
+      containers:
+        - name: myakscluster-app
+          image: acrworkflow1706750885628.azurecr.io/image-workflow-1706750885628:latest
+          ports:
+            - containerPort: 8000
